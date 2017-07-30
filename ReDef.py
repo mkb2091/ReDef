@@ -5,7 +5,7 @@ class ReDef(object):
         with open('stdlib.redef') as stdlib:
             with open(language + '.redef') as llib:
                 code = stdlib.read() + llib.read() + code
-        def_regex = r'def "((?:(?:\\")|[^"])*)"\s*:\s*"((?:(?:\\")|[^"])*)"'
+        def_regex = r'def "([^"]*)"\s*:\s*"([^"]*)"'
         cdefs = dict(re.findall('c' + def_regex, code))
         code = re.sub('c' + def_regex, '', code)
         redefs = dict(re.findall(def_regex, code))
