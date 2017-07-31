@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import argparse
 import re
 class ReDef(object):
@@ -6,9 +7,9 @@ class ReDef(object):
             with open(language + '.redef') as llib:
                 code = stdlib.read() + llib.read() + code
         def_regex = r'def "([^"]*)"\s*:\s*"([^"]*)"'
-        cdefs = dict(re.findall('c' + def_regex, code))
+        cdefs = OrderedDict(re.findall('c' + def_regex, code))
         code = re.sub('c' + def_regex, '', code)
-        redefs = dict(re.findall(def_regex, code))
+        redefs = OrderedDict(re.findall(def_regex, code))
         code = re.sub(def_regex, '', code)
         self.code = code
         self.apply_redefs(redefs)
@@ -18,24 +19,18 @@ class ReDef(object):
         old = ''
         while old != code:
             old = code
-            for regex in sorted(redefs):
+            for regex in redefs:
                 code = re.sub(regex, redefs[regex], code)
         self.code = code
     def apply_cdefs(self, cdefs):
-        code = self.code
-        compiled = []
-        while code:
-            found = False
-            for regex in sorted(cdefs):
-                m = re.match(regex, code)
-                if m and not found:
-                    compiled.append(re.sub(regex, cdefs[regex], m.group()))
-                    code=code[m.end():]
-                    found = True
-            if not found:
-                compiled.append(code[0])
-                code = code[1:]
-        self.code = ''.join(compiled)
+        regex_master = '|'.join('(?:%s)' % i for i in cdefs)
+        comp = []
+        for m1 in re.finditer(regex_master, self.code):
+            for regex in cdefs:
+                for m2 in re.finditer(regex, self.code):
+                    if m1.span() == m2.span():
+                        comp.append(re.sub(regex, cdefs[regex], m1.group()))
+        self.code = ''.join(comp)
             
 def main():
     parser = argparse.ArgumentParser()
