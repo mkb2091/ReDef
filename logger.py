@@ -46,10 +46,3 @@ class Logger(object):
                  '[WARNING]',
                  *value]
         cprint(*msg, sep=sep, end=end, colour=31)
-
-if __name__=='__main__':
-    logger=Logger()
-    logger.info('this is some infomation')
-    logger.warning('this is a warning')
-    logger.error('this is a critical error')
-    sys.stderr.write('hi\n')
