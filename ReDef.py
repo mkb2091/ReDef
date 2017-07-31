@@ -5,11 +5,19 @@ import re
 import logger
 class ReDef(object):
     def __init__(self, code, language, Logger):
-        with open('stdlib.redef') as stdlib:
-            Logger.info('Successfully opened stdlib')
-            with open(language + '.redef') as llib:
-                Logger.info('Successfully opened language file')
-                code = stdlib.read() + llib.read() + code
+        try:
+            with open('stdlib.redef') as stdlib:
+                Logger.info('Successfully opened stdlib')
+                try:
+                    with open(language + '.redef') as llib:
+                        Logger.info('Successfully opened language file')
+                        code = stdlib.read() + llib.read() + code
+                except FileNotFoundError:
+                    Logger.error('Language file not found, check language argument')
+                    exit(1)
+        except FileNotFoundError:
+            Logger.error('Stdlib file not found')
+            exit(1)
         def_regex = r'def "([^"]*)"\s*:\s*"([^"]*)"'
         cdefs = OrderedDict(re.findall('c' + def_regex, code))
         code = re.sub('c' + def_regex, '', code)
@@ -46,9 +54,13 @@ def main():
                         default=2, type=int)
     args = parser.parse_args()
     Logger = logger.Logger(args.verbosity)
-    with open(args.file) as file:
-        Logger.info('Successfully opened ', args.file)
-        code = file.read()
+    try:
+        with open(args.file) as file:
+            Logger.info('Successfully opened', args.file)
+            code = file.read()
+    except FileNotFoundError:
+        Logger.error('No such file:', args.file)
+        exit(1)
     redef = ReDef(code, args.language, Logger)
     with open(args.output, 'w') as file:
         file.write(redef.code)
