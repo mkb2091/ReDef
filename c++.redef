@@ -1,15 +1,18 @@
 cdef "^":"#include <unordered_map>
 #include <stdexcept>
 #include <iostream>
+#include <string>
 int main () {
 double var = 0;
+std::string input;
 std::unordered_map<long long, double> memory;
 "
 cdef "$(?![^.])":"return 0;}"
+cdef "\*(?P<t>[0-9]+)":"var *= \1;"
 cdef "\+(?P<plus>-?[0-9]+(?:\.[0-9]+)?)":"var += \1;"
 cdef "-(?P<minus>-?[0-9]+(?:\.[0-9]+)?)":"var -= \1;"
 cdef "=(?P<assign>-?[0-9]+(?:\.[0-9]+)?)":"var = \1;"
 cdef ":=(?P<store>-?[0-9]+(?:\.[0-9]+)?)":"if (var != 0) {memory[\1] = var;} else {try {memory.erase(\1);} catch (const std::out_of_range& oor) {}}"
 cdef "=:(?P<load>-?[0-9]+(?:\.[0-9]+)?)":"try {var = memory[\1];} catch (const std::out_of_range& oor) {var = 0;}"
 cdef "p":"std::cout << var << std::endl;"
-cdef "i":"std::cin >> var;"
+cdef "i":"getline(std::cin, input);try {var = std::stod(input);} catch (const std::invalid_argument& ia) {var = 0;}input = {};"
