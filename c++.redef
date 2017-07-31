@@ -1,9 +1,9 @@
-cdef "^":"#include <map>
+cdef "^":"#include <unordered_map>
 #include <stdexcept>
 #include <iostream>
 int main () {
 double var = 0;
-std::map<long long, double> memory;
+std::unordered_map<long long, double> memory;
 "
 cdef "$(?![^.])":"return 0;}"
 cdef "\+(?P<plus>-?[0-9]+(?:\.[0-9]+)?)":"var += \1;"
