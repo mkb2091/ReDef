@@ -21,11 +21,15 @@ class ReDef(object):
         def_regex = r'def "([^"]*)"\s*:\s*"([^"]*)"'
         cdefs = OrderedDict(re.findall('c' + def_regex, code))
         code = re.sub('c' + def_regex, '', code)
+        Logger.info('Found', len(cdefs), 'cdefs')
         redefs = OrderedDict(re.findall(def_regex, code))
         code = re.sub(def_regex, '', code)
+        Logger.info('Found', len(redefs), 'redefs')
         self.code = code
         self.apply_redefs(redefs)
+        Logger.info('Applied redefs')
         self.apply_cdefs(cdefs)
+        Logger.info('Applied cdefs')
     def apply_redefs(self, redefs):
         code = self.code
         old = ''
@@ -62,6 +66,7 @@ def main():
         Logger.error('No such file:', args.file)
         exit(1)
     redef = ReDef(code, args.language, Logger)
+    Logger.info('Successfully generated code')
     with open(args.output, 'w') as file:
         file.write(redef.code)
     
