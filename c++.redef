@@ -1,52 +1,99 @@
 cdef "^":"#include <unordered_map>
 #include <stdexcept>
 #include <iostream>
+#include <variant>
 #include <string>
 #include <deque>
-std::deque<double> stack;
-std::unordered_map<long long, double> memory;
-std::deque<double> pop_x(unsigned long long x) {
-	std::deque<double> result;
+#include <math.h>
+class multi {
+	std::variant<double, std::string> data;
+	public:
+	multi () {data=0.0;}
+	multi (std::string val) {data=val;}
+	multi (int val) {data=val;}
+	multi (double val) {data=val;}
+	multi (const char* val) {data=val;}
+	operator double() {
+		try {return std::get<double>(data);}
+		catch (std::bad_variant_access&) {
+			try {return std::stod(std::get<std::string>(data));}
+			catch (std::invalid_argument&) {return 0.0;}
+			catch (std::out_of_range&) {return 0.0;}
+		}
+	}
+	operator std::string() {
+		try {return std::get<std::string>(data);}
+		catch (std::bad_variant_access&) {
+			try {return std::to_string(std::get<double>(data));}
+			catch (std::invalid_argument&) {return std::string{};}
+		}
+	}
+	multi operator +(multi arg) {
+		try {return std::get<double>(data) + double(arg);}
+		catch (std::bad_variant_access&) {
+			return (std::string(*this) + std::string(arg));
+		}
+	}
+	multi operator -(multi arg) {
+		return (double(*this) - double(arg));
+	}
+	multi operator *(multi arg) {
+	try {return std::get<double>(data) * double(arg);}
+		catch (std::bad_variant_access&) {
+			std::string res;
+			std::string old = *this;
+			unsigned long long num = arg;
+			for (unsigned int i = 0; i < num; i++) {res += old;}
+			return res;
+		}
+	}
+	multi operator /(multi arg) {
+	return (double(*this) / double(arg));}
+	multi operator %(multi arg) {
+	return (fmod(double(*this), double(arg)));}
+	multi operator +=(multi arg) {return *this = *this + arg;}
+	multi operator -=(multi arg) {return *this = *this - arg;}
+	multi operator *=(multi arg) {return *this = *this * arg;}
+	multi operator /=(multi arg) {return *this = *this / arg;}
+	multi operator %=(multi arg) {return *this = *this / arg;}
+};
+std::deque<multi> stack;
+std::unordered_map<long long, multi> memory;
+auto pop_x(unsigned long long x) {
+	std::deque<multi> result;
 	unsigned long long size = stack.size();
 	for (unsigned long long i = 0; i < x; i++) {
 		if (i < size) {
 			result.push_back(stack.front());
 			stack.pop_front();
 		} else {
-			result.push_back(0);
+			result.push_back(0.0);
 		}
 	}
 	return result;
 }
-void push(double value) {stack.push_front(value);std::cout << value << ' ' << stack.size() << std::endl;}
-void load(long long key) {
-	try {
-		push(memory[key]);
-	} catch (const std::out_of_range& oor) {
-		push(0);
+auto pop() {
+	multi value = 0;
+	if (stack.size()) {
+		value = stack.front();
+		stack.pop_front();
 	}
+	return value;
 }
-void store(long long key) {
-	double value = pop_x(1)[0];
-	if (value) {
-		memory[key] = value;
-	} else {
-		try {memory.erase(key);}
-		catch (const std::out_of_range& oor) {}
-	}
-}
-void plus() {push(pop_x(1)[0] + pop_x(1)[0]);}
-void minus() {push(pop_x(1)[0] - pop_x(1)[0]);}
-void multiply() {push(pop_x(1)[0] * pop_x(1)[0]);}
+void push(multi value) {stack.push_front(value);}
+
+void plus() {push(pop() + pop());}
+void minus() {push(pop() - pop());}
+void multiply() {push(pop() * pop());}
 int main () {
 std::string input;
 "
 cdef "$(?![^.])":"return 0;}"
 cdef "(?P<literal_int>[0-9]+(?:\.[0-9]+)?)":"push(\1);"
-cdef "\*(?P<t>[0-9]+)":"var *= \1;"
+cdef "\*":"multiply();"
 cdef "\+":"plus();"
 cdef "\-":"minus();"
 cdef ":=(?P<store>-?[0-9]+(?:\.[0-9]+)?)":"store(\1);"
 cdef "=:(?P<load>-?[0-9]+(?:\.[0-9]+)?)":"load(\1);"
-cdef "p":"std::cout << pop_x(1)[0] << std::endl;"
-cdef "i":"getline(std::cin, input);try {push(std::stod(input));} catch (const std::invalid_argument& ia) {push(0);}input = {};"
+cdef "p":"std::cout << pop() << std::endl;"
+cdef "i":"getline(std::cin, input);push(input);input = {};"
