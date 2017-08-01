@@ -26,6 +26,7 @@ class ReDef(object):
         code = re.sub(def_regex, '', code)
         Logger.info('Found', len(redefs), 'redefs')
         self.code = code
+        self.logger = Logger
         self.apply_redefs(redefs)
         Logger.info('Applied redefs')
         self.apply_cdefs(cdefs)
@@ -45,6 +46,7 @@ class ReDef(object):
             for regex in cdefs:
                 for m2 in re.finditer(regex, self.code):
                     if m1.span() == m2.span():
+                        self.logger.info(regex, m1.group())
                         comp.append(re.sub(regex, cdefs[regex], m1.group()))
         self.code = ''.join(comp)
             
