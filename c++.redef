@@ -81,10 +81,22 @@ auto pop() {
 	return value;
 }
 void push(multi value) {stack.push_front(value);}
-
+void store(long long key) {
+	multi var = pop();
+	if (var) {memory[key] = var;}
+	else {
+		try {memory.erase(key);}
+		catch (std::out_of_range&) {}
+	}
+}
+void load(long long key) {
+	try {push(memory[key]);}
+	catch (std::out_of_range&) {push(0.0);}
+}
 void plus() {push(pop() + pop());}
 void minus() {push(pop() - pop());}
 void multiply() {push(pop() * pop());}
+void modulo() {push(pop() % pop());}
 int main () {
 std::string input;
 "
@@ -93,6 +105,7 @@ cdef "(?P<literal_int>[0-9]+(?:\.[0-9]+)?)":"push(\1);"
 cdef "\*":"multiply();"
 cdef "\+":"plus();"
 cdef "\-":"minus();"
+cdef "%":"modulo();"
 cdef ":=(?P<store>-?[0-9]+(?:\.[0-9]+)?)":"store(\1);"
 cdef "=:(?P<load>-?[0-9]+(?:\.[0-9]+)?)":"load(\1);"
 cdef "p":"std::cout << pop() << std::endl;"
