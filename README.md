@@ -1,5 +1,5 @@
 # ReDef
-**ReDef** is programming language. It is compiled into c++ at the moment, but hopefully it will support more languages in the future.
+**ReDef** is stack-oriented programming language. It aims to never crash and always generate valid code. It is compiled into c++ at the moment, but hopefully it will support more languages in the future.
 ## Syntax
 **ReDef** has two basic commands **cdef** and **def**, both use regular expressions and are written as **command** "regex1":"regex2". e.g. def "i":"input()", regex1 is replaced by regex2 using regular expression substitution in python3
 ### def
@@ -15,4 +15,17 @@ cdef "parse":"parser();"
 cdef "p":"print();"
 parse
 would generate parse();
-## Hello World
+### 
+## How to run a ReDef program
+### Requirements
+This requires python 3 to run ReDef.py and g++-7 to compile the output c++ file
+### Commands
+git clone https://github.com/RaspPiTor/ReDef/
+
+cd ReDef
+
+python3 ReDef.py /path/to/code out.cpp
+
+g++-7 out.cpp
+
+./a.out
