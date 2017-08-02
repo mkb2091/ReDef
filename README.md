@@ -15,7 +15,32 @@ cdef "parse":"parser();"
 cdef "p":"print();"
 parse
 would generate parse();
-### 
+### Example programs
+5 2 + p
+
+Pushes 5 and 2, then adds them then prints top value of stack
+
+'H'e'l'l'o' 'W'o'r'l'd'!+++++++++++p
+
+Output >>> Hello World
+
+Pushes indvidual chars of "Hello World!", adds them all together and then prints.
+
+'H'e'l'l'o' 'W'o'r'l'd'!+++++++++++i:=1=:1+=:1*p
+
+Input >>> 2
+
+Output >>> Hello World!2Hello World!2
+
+Pushes indvidual chars of "Hello World!", adds them all together, pushes input, stores input in a variable called 1, loads variable 1, adds it to the string, loads variable 1, multiplies, then prints.
+
+i2/p
+
+Input >>> 3
+
+Output >>> 1.5
+
+Pushes input, pushes 2, divide, print.
 ## How to run a ReDef program
 ### Requirements
 This requires python 3 to run ReDef.py and g++-7 to compile the output c++ file
