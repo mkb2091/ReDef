@@ -5,7 +5,7 @@
 ### def
 All **def**s are applied first. They are used for optimizations and shortcuts. They are applied until the code is the same after applying all of them, so if used wrong, they could cause problems. e.g. def "":"a" would replace the blank character between every character in the code with a turning "1+1" into "a1a+a1a" and then turn that into "aaa1aaa+aaa1aaa" and so on.
 ### cdef
-These are used for controlling the generated code.They are together, sequencially through the code once. Strings which don't match any of the **cdef**s are ignored. For example 
+These are used for controlling the generated code. They are together, sequentially through the code once. Strings which don't match any of the **cdef**s are ignored. For example 
 cdef "p":"print();"
 cdef "parse":"parser();"
 parse
@@ -24,7 +24,7 @@ Pushes 5 and 2, then adds them then prints top value of stack
 
 Output >>> Hello World
 
-Pushes indvidual chars of "Hello World!", adds them all together and then prints.
+Pushes individual chars of "Hello World!", adds them all together and then prints.
 
 'H'e'l'l'o' 'W'o'r'l'd'!+++++++++++i:=1=:1+=:1*p
 
@@ -32,7 +32,7 @@ Input >>> 2
 
 Output >>> Hello World!2Hello World!2
 
-Pushes indvidual chars of "Hello World!", adds them all together, pushes input, stores input in a variable called 1, loads variable 1, adds it to the string, loads variable 1, multiplies, then prints.
+Pushes individual chars of "Hello World!", adds them all together, pushes input, stores input in a variable called 1, loads variable 1, adds it to the string, loads variable 1, multiplies, then prints.
 
 i2/p
 
