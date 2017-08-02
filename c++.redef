@@ -97,6 +97,7 @@ void plus() {push(pop() + pop());}
 void minus() {push(pop() - pop());}
 void multiply() {push(pop() * pop());}
 void modulo() {push(pop() % pop());}
+void divide() {push(pop() / pop());}
 int main () {
 std::string input;
 "
@@ -104,6 +105,7 @@ cdef "$(?![^.])":"return 0;}"
 cdef "(?P<literal_string>'[^'])":"push(std::string(1, \1'));"
 cdef "(?P<literal_int>[0-9]+(?:\.[0-9]+)?)":"push(\1);"
 cdef "\*":"multiply();"
+cdef "/":"divide();"
 cdef "\+":"plus();"
 cdef "\-":"minus();"
 cdef "%":"modulo();"
