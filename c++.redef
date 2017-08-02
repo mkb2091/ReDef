@@ -73,11 +73,11 @@ auto pop_x(unsigned long long x) {
 	return result;
 }
 auto pop() {
-	multi value = 0;
+	multi value;
 	if (stack.size()) {
 		value = stack.front();
 		stack.pop_front();
-	}
+	} else {}
 	return value;
 }
 void push(multi value) {stack.push_front(value);}
@@ -101,6 +101,7 @@ int main () {
 std::string input;
 "
 cdef "$(?![^.])":"return 0;}"
+cdef "(?P<literal_string>'[^'])":"push(std::string(1, \1'));"
 cdef "(?P<literal_int>[0-9]+(?:\.[0-9]+)?)":"push(\1);"
 cdef "\*":"multiply();"
 cdef "\+":"plus();"
@@ -108,5 +109,5 @@ cdef "\-":"minus();"
 cdef "%":"modulo();"
 cdef ":=(?P<store>-?[0-9]+(?:\.[0-9]+)?)":"store(\1);"
 cdef "=:(?P<load>-?[0-9]+(?:\.[0-9]+)?)":"load(\1);"
-cdef "p":"std::cout << pop() << std::endl;"
+cdef "p":"std::cout << std::string(pop()) << std::endl;"
 cdef "i":"getline(std::cin, input);push(input);input = {};"
