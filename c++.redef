@@ -61,20 +61,6 @@ class multi {
 };
 std::deque<multi> stack;
 std::unordered_map<long long, multi> memory;
-std::deque<multi> pop_x(unsigned long long x) {
-	std::deque<multi> result;
-	unsigned long long size = stack.size();
-	for (unsigned long long i = 0; i < x; i++) {
-		if (i < size) {
-			result.push_back(stack.front());
-			stack.pop_front();
-		}
-		else {
-			result.push_back(0.0);
-		}
-	}
-	return result;
-}
 multi pop() {
 	multi value;
 	if (stack.size()) {
