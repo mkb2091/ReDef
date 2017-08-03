@@ -43,7 +43,7 @@ Output >>> 1.5
 Pushes input, pushes 2, divide, print.
 ## How to run a ReDef program
 ### Requirements
-This requires python 3 to run ReDef.py and g++-7 to compile the output c++ file
+This requires python 3 to run ReDef.py and a c++ compiler(I have only tested it with g++-7 and g++-5 to compile the output c++ file
 ### Commands
 git clone https://github.com/RaspPiTor/ReDef/
 
@@ -51,6 +51,6 @@ cd ReDef
 
 python3 ReDef.py /path/to/code out.cpp
 
-g++-7 out.cpp
+g++ out.cpp
 
 ./a.out

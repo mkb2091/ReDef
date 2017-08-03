@@ -1,105 +1,107 @@
 cdef "^":"#include <unordered_map>
 #include <stdexcept>
 #include <iostream>
-#include <variant>
 #include <string>
 #include <deque>
 #include <math.h>
 class multi {
-	std::variant<double, std::string> data;
+	char type;
+	std::string data_string;
+	double data_double = 0;
 	public:
-	multi () {data=0.0;}
-	multi (std::string val) {data=val;}
-	multi (int val) {data=val;}
-	multi (double val) {data=val;}
-	multi (const char* val) {data=val;}
-	operator double() {
-		try {return std::get<double>(data);}
-		catch (std::bad_variant_access&) {
-			try {return std::stod(std::get<std::string>(data));}
-			catch (std::invalid_argument&) {return 0.0;}
-			catch (std::out_of_range&) {return 0.0;}
+		multi() { type = 'd'; data_double = 0.0; }
+		multi(std::string val) { type = 's'; data_string = val; }
+		multi(const char* val) { type = 's'; data_string = val; }
+		multi(int val) { type = 'd'; data_double = val; }
+		multi(double val) { type = 'd'; data_double = val; }
+		operator double() {
+			if (type == 'd') { return data_double; }
+			else {
+				try { return std::stod(data_string); }
+				catch (std::invalid_argument&) { return 0.0; }
+				catch (std::out_of_range&) { return 0.0; }
+			}
 		}
-	}
-	operator std::string() {
-		try {return std::get<std::string>(data);}
-		catch (std::bad_variant_access&) {
-			try {return std::to_string(std::get<double>(data));}
-			catch (std::invalid_argument&) {return std::string{};}
+		operator std::string() {
+			if (type == 's') { return data_string; }
+			else {
+				try { return std::to_string(data_double); }
+				catch (std::invalid_argument&) { return std::string{}; }
+			}
 		}
-	}
-	multi operator +(multi arg) {
-		try {return std::get<double>(data) + double(arg);}
-		catch (std::bad_variant_access&) {
-			return (std::string(*this) + std::string(arg));
+		multi operator +(multi arg) {
+			if (type == 'd') { return data_double + double(arg); }
+			else { return (std::string(*this) + std::string(arg)); }
 		}
-	}
-	multi operator -(multi arg) {
-		return (double(*this) - double(arg));
-	}
-	multi operator *(multi arg) {
-	try {return std::get<double>(data) * double(arg);}
-		catch (std::bad_variant_access&) {
-			std::string res;
-			std::string old = *this;
-			unsigned long long num = arg;
-			for (unsigned int i = 0; i < num; i++) {res += old;}
-			return res;
+		multi operator -(multi arg) {
+			return (double(*this) - double(arg));
 		}
-	}
-	multi operator /(multi arg) {
-	return (double(*this) / double(arg));}
-	multi operator %(multi arg) {
-	return (fmod(double(*this), double(arg)));}
-	multi operator +=(multi arg) {return *this = *this + arg;}
-	multi operator -=(multi arg) {return *this = *this - arg;}
-	multi operator *=(multi arg) {return *this = *this * arg;}
-	multi operator /=(multi arg) {return *this = *this / arg;}
-	multi operator %=(multi arg) {return *this = *this / arg;}
+		multi operator *(multi arg) {
+			if (type == 'd') { return data_double * double(arg); }
+			else {
+				std::string res;
+				std::string old = *this;
+				unsigned long long num = arg;
+				for (unsigned int i = 0; i < num; i++) { res += old; }
+				return res;
+			}
+		}
+		multi operator /(multi arg) {
+			return (double(*this) / double(arg));
+		}
+		multi operator %(multi arg) {
+			return (fmod(double(*this), double(arg)));
+		}
+		multi operator +=(multi arg) { return *this = *this + arg; }
+		multi operator -=(multi arg) { return *this = *this - arg; }
+		multi operator *=(multi arg) { return *this = *this * arg; }
+		multi operator /=(multi arg) { return *this = *this / arg; }
+		multi operator %=(multi arg) { return *this = *this / arg; }
 };
 std::deque<multi> stack;
 std::unordered_map<long long, multi> memory;
-auto pop_x(unsigned long long x) {
+std::deque<multi> pop_x(unsigned long long x) {
 	std::deque<multi> result;
 	unsigned long long size = stack.size();
 	for (unsigned long long i = 0; i < x; i++) {
 		if (i < size) {
 			result.push_back(stack.front());
 			stack.pop_front();
-		} else {
+		}
+		else {
 			result.push_back(0.0);
 		}
 	}
 	return result;
 }
-auto pop() {
+multi pop() {
 	multi value;
 	if (stack.size()) {
 		value = stack.front();
 		stack.pop_front();
-	} else {}
+	}
+	else {}
 	return value;
 }
 void push(multi value) {stack.push_front(value);}
 void store(long long key) {
 	multi var = pop();
-	if (var) {memory[key] = var;}
+	if (var) { memory[key] = var; }
 	else {
-		try {memory.erase(key);}
+		try { memory.erase(key); }
 		catch (std::out_of_range&) {}
 	}
 }
 void load(long long key) {
-	try {push(memory[key]);}
-	catch (std::out_of_range&) {push(0.0);}
+	try { push(memory[key]); }
+	catch (std::out_of_range&) { push(0.0); }
 }
-void plus() {push(pop() + pop());}
-void minus() {push(pop() - pop());}
-void multiply() {push(pop() * pop());}
-void modulo() {push(pop() % pop());}
-void divide() {push(pop() / pop());}
+void plus() { push(pop() + pop()); }
+void minus() { push(pop() - pop()); }
+void multiply() { push(pop() * pop()); }
+void modulo() { push(pop() % pop()); }
+void divide() { push(pop() / pop()); }
 int main () {
-std::string input;
 "
 cdef "$(?![^.])":"return 0;}"
 cdef "(?P<literal_string>'[^'])":"push(std::string(1, \1'));"
