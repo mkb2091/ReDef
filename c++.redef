@@ -2,7 +2,7 @@ cdef "^":"#include <unordered_map>
 #include <stdexcept>
 #include <iostream>
 #include <string>
-#include <deque>
+#include <stack>
 #include <math.h>
 class multi {
 	char type;
@@ -59,18 +59,17 @@ class multi {
 		multi operator /=(multi arg) { return *this = *this / arg; }
 		multi operator %=(multi arg) { return *this = *this / arg; }
 };
-std::deque<multi> stack;
+std::stack<multi> stack;
 std::unordered_map<long long, multi> memory;
 multi pop() {
 	multi value;
 	if (stack.size()) {
-		value = stack.front();
-		stack.pop_front();
+		value = stack.top();
+		stack.pop();
 	}
 	else {}
 	return value;
 }
-void push(multi value) {stack.push_front(value);}
 void store(long long key) {
 	multi var = pop();
 	if (var) { memory[key] = var; }
@@ -80,19 +79,19 @@ void store(long long key) {
 	}
 }
 void load(long long key) {
-	try { push(memory[key]); }
-	catch (std::out_of_range&) { push(0.0); }
+	try { stack.push(memory[key]); }
+	catch (std::out_of_range&) { stack.push(0.0); }
 }
-void plus() { push(pop() + pop()); }
-void minus() { push(pop() - pop()); }
-void multiply() { push(pop() * pop()); }
-void modulo() { push(pop() % pop()); }
-void divide() { push(pop() / pop()); }
+void plus() { stack.push(pop() + pop()); }
+void minus() { stack.push(pop() - pop()); }
+void multiply() { stack.push(pop() * pop()); }
+void modulo() { stack.push(pop() % pop()); }
+void divide() { stack.push(pop() / pop()); }
 int main () {
 "
 cdef "$(?![^.])":"return 0;}"
-cdef "(?P<literal_string>'[^'])":"push(\1');"
-cdef "(?P<literal_int>[0-9]+(?:\.[0-9]+)?)":"push(\1);"
+cdef "(?P<literal_string>'[^'])":"stack.push(\1');"
+cdef "(?P<literal_int>[0-9]+(?:\.[0-9]+)?)":"stack.push(\1);"
 cdef "\*":"multiply();"
 cdef "/":"divide();"
 cdef "\+":"plus();"
@@ -101,4 +100,4 @@ cdef "%":"modulo();"
 cdef ":=(?P<store>-?[0-9]+(?:\.[0-9]+)?)":"store(\1);"
 cdef "=:(?P<load>-?[0-9]+(?:\.[0-9]+)?)":"load(\1);"
 cdef "p":"std::cout << std::string(pop()) << std::endl;"
-cdef "i":"{std::string input; getline(std::cin, input); push(input); }"
+cdef "i":"{std::string input; getline(std::cin, input); stack.push(input); }"
