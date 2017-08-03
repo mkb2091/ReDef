@@ -63,7 +63,7 @@ std::stack<multi> stack;
 std::unordered_map<long long, multi> memory;
 multi pop() {
 	multi value;
-	if (stack.size()) {
+	if (!stack.empty()) {
 		value = stack.top();
 		stack.pop();
 	}
